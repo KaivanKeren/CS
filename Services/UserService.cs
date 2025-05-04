@@ -16,7 +16,7 @@ namespace CS.Services
         {
             await Task.Delay(1000);
             _logger.LogInformation("Fetched user data.");
-            return new User { Name = "Ismail", Age = 22 };
+            return new User { Name = "Ismail", Age = 17 };
         }
     }
 }
