@@ -1,27 +1,19 @@
-﻿using CS.Services;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.EntityFrameworkCore;
+using CS.AppContext;
+using System.Text;
+using CS.Services;
 
-class Program
-{
-    static async Task Main(string[] args)
-    {
-        var services = new ServiceCollection()
-            .AddLogging(cfg => {
-                cfg.AddConsole();
-                cfg.SetMinimumLevel(LogLevel.Information);
-            })
-            .AddSingleton<UserService>()
-            .BuildServiceProvider();
+var builder = WebApplication.CreateBuilder(args);
 
-        var logger = services.GetRequiredService<ILogger<Program>>();
-        var userService = services.GetRequiredService<UserService>();
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+builder.Services.AddDbContext<MyDBContext>(options =>
+    options.UseNpgsql(connectionString));
 
-        logger.LogInformation("App started.");
+builder.Services.AddScoped<UserService>();
+builder.Services.AddControllers();
+builder.Services.AddEndpointsApiExplorer();
 
-        var user = await userService.GetUserAsync();
-        Console.WriteLine($"User: {user.Name}, Age: {user.Age}");
+var app = builder.Build();
 
-        logger.LogInformation("App finished.");
-    }
-}
+app.MapControllers();
+app.Run();
